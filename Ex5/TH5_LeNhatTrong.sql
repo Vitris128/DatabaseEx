@@ -1,3 +1,4 @@
+--2
 Select L.tenloai
 from May M join Loai L on M.idloai=L.idloai
 where M.idMay='p8';
@@ -30,7 +31,7 @@ from Caidat
 where idPM='log1';
 
 --8
-Select TENMAY,CONCAT(CONCAT(IP,'.'),ad)
+Select TENMAY ,IP||'.'||AD
 from May
 where IDLOAI='TX';
 
@@ -65,22 +66,32 @@ group by idPM having COUNT(idPM) >=2;
 --15
 Select L.IDLOAI, L.TENLOAI from LOAI L left join MAY M on L.IDLOAI=M.IDLOAI where M.IDLOAI IS NULL;
 
+Select IDLOAI from LOAI minus Select IDLOAI from MAY;
+
 --16
 Select DISTINCT(M.IDLOAI), L.TENLOAI
 from MAY M join PHANMEM PM on M.IDLOAI=PM.IDLOAI join Loai L on M.IDLOAI = L.IDLOAI;
 
+Select distinct(idLoai)
+from MAY where idLoai in (
+  Select idLoai
+  from PHANMEM);
 --17
 Select DISTINCT(M.IDLOAI), L.TENLOAI
 from MAY M left join PHANMEM PM on M.IDLOAI=PM.IDLOAI join Loai L on M.IDLOAI = L.IDLOAI
 where PM.IDLOAI IS NULL;
 
+Select distinct(idLoai)
+from May where idLoai NOT IN (
+  Select idLoai
+  from PHANMEM);
 --18
-Select M.TENMAY,CONCAT(CONCAT(M.IP,'.'),M.ad)
+Select M.TENMAY,M.IP||'.'||AD
 from CAIDAT CD join MAY M on CD.IDMAY = M.IDMAY  
 where CD.IDPM='log6';
 
 --19
-Select M.TENMAY,CONCAT(CONCAT(M.IP,'.'),M.ad)
+Select M.TENMAY,M.IP||'.'||AD
 from CAIDAT CD join PHANMEM PM on CD.IDPM = PM.IDPM join MAY M on CD.IDMAY = M.IDMAY  
 where PM.TENPM='Oracle 8';
 
@@ -100,8 +111,8 @@ where PM.TENPM='Oracle 6';
 Select TENPM
 from PHANMEM
 where NGAYMUA = (
-    Select MAX(NGAYMUA)
-    from PHANMEM);
+      Select MAX(NGAYMUA)
+      from PHANMEM);
 
 --23
 Select TENPM
@@ -122,27 +133,40 @@ where IDLOAI='UNIX' AND GIA >(
 );
 
 --25
-Select DISTINCT(IDMAY)
-from CAIDAT
-where IDMAY !='p6' AND IDPM = any(
-    Select IDPM
-    from CAIDAT CD
-    where CD.IDMAY='p6')
-order by IDMAY;
+Select TENMAY
+from MAY M JOIN (Select DISTINCT(IDMAY)
+                from CAIDAT
+                where IDMAY !='p6' AND IDPM = any(
+                    Select IDPM
+                    from CAIDAT CD
+                    where CD.IDMAY='p6')
+                order by IDMAY) T 
+            ON M.IDMAY = T.IDMAY;
 
+Select M.TENMAY
+from MAY M
+    INNER JOIN CAIDAT CD ON M.IDMAY=CD.IDMAY
+    JOIN (Select IDPM from CAIDAT where IDMAY='p6') T ON T.IDPM=CD.IDPM
+where M.IDMAY <>'p6';
 --26
 Create table BT26 as
     Select *
     from CAIDAT
-    where IDPM = any(
+    where IDPM = ANY(
         Select IDPM
         from CAIDAT CD
         where CD.IDMAY='p6')
     order by IDMAY;
 
-Select IDMAY,COUNT(IDMAY)
+Select IDMAY
 from BT26
 group by IDMAY having IDMAY !='p6' AND COUNT(IDMAY) = (
     Select COUNT(IDMAY)
     from BT26
     group by IDMAY having IDMAY='p6');
+    
+    
+Select M.TENMAY, M.IDMAY, COUNT(*) 
+FROM MAY M  INNER JOIN CAIDAT CD ON M.IDMAY = CD.IDMAY
+WHERE IDPM IN (Select IDPM from CAIDAT where IDMAY='p6') AND M.IDMAY<>'p6'
+GROUP BY M.TENMAY, M.IDMAY HAVING COUNT(DISTINCT IDPM) >= (SELECT COUNT(*) FROM CAIDAT WHERE IDMAY='p6');

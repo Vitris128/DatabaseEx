@@ -9,9 +9,7 @@ Select *
     from MUON;
 
 -- CAU 2
-    /*  So d? liên thông du?c v? t?i:
-        https://dbdiagram.io/d/6425a92a5758ac5f172582a8
-    */
+        -- https://dbdiagram.io/d/6425a92a5758ac5f172582a8
 
 -- CAU 3
 Select NT, tua 
