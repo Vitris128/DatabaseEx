@@ -87,6 +87,17 @@ where  pizza in (
     )
 ); 
 
+SELECT DISTINCT quanpizza
+from PHUC_VU WHERE pizza in (SELECT DISTINCT pizza
+                             from AN
+                             WHERE pizza NOT in (
+                               select pizza 
+                               from   an
+                               where  ten = 'Eli')
+                             );
+
+
+
 -- 10
 
 select quanPizza 
