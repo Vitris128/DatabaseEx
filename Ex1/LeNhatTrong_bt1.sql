@@ -134,7 +134,8 @@ alter table phanmemunix add primary key (idPM);
 alter table phanmemunix add gia int;
 alter table phanmemunix modify version varchar(20);
 alter table phanmemunix add unique (tenPM);
-insert into phanmemunix(idPM, tenPM, ngaymua, version, gia) select idPM, tenPM, ngaymua, version, gia from phanmem;
+insert into phanmemunix(idPM, tenPM, ngaymua, version, gia) 
+		select idPM, tenPM, ngaymua, version, gia from phanmem;
 alter table phanmemunix drop column version;
 set foreign_key_checks=0;
 delete from phanmem where gia > 5000;
